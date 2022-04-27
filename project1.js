@@ -7,14 +7,10 @@ const cel = (el) => document.createElement(el);
 //DOM ELEMENTS
 // -------------------------------------------------
 const addIncome = qs("#add-income");
-const nameIncome = qs(".name-income");
-const amountIncome = qs(".amount-income");
 const incomeList = qs(".income-list");
 const incomeSum = qs("#income-sum");
 
 const addExpense = qs("#add-expense");
-const nameExpense = qs(".name-expense");
-const amountExpense = qs(".amount-expense");
 const expenseList = qs(".expense-list");
 const expenseSum = qs("#expense-sum");
 
@@ -24,10 +20,10 @@ const mainSum = qs("#main-sum");
 // -------------------------------------------------
 
 let incomeData = []; // [{ id: uuid.v4(), name: "przykład", amount: 0 }]
-let incomeAmount = 0;
+let amount = 0;
 
-let expenseData = []; // { id: uuid.v4(), name2: "przychod", amount2: 0 }
-let expenseAmount = 0;
+let expenseData = [];
+let amount2 = 0;
 
 //VIEW
 // -------------------------------------------------
@@ -66,34 +62,61 @@ const submitIncomes = () => {
       incomeLi.removeChild(incomeLiName);
       incomeLi.removeChild(incomeLiAmount);
 
-      //tworze dwa inputy
+      //tworze forme i dwa inputy
+      const incomeEditForm = cel("form");
       const incomeNameEdit = cel("input");
       const incomeAmountEdit = cel("input");
-      incomeNameEdit.setAttribute = ("name", "editName");
-      incomeAmountEdit.setAttribute = ("name", "editAmount");
-      incomeLi.appendChild(incomeNameEdit);
-      incomeLi.appendChild(incomeAmountEdit);
+
+      incomeEditForm.classList.add = "editForm";
+      incomeNameEdit.classList.add = "editName";
+      incomeAmountEdit.classList.add = "editAmount";
+
+      incomeEditForm.appendChild(incomeNameEdit);
+      incomeEditForm.appendChild(incomeAmountEdit);
       incomeNameEdit.value = `${name}`;
       incomeAmountEdit.value = `${amount}`;
 
-      //usuwam buttony edytuj/usun, dodaje buttony zapisz/anuluj
+      //usuwam buttony edytuj/usun, dodaje buttony akceptuj/anuluj
       incomeLi.removeChild(editBtn);
       incomeLi.removeChild(deleteBtn);
 
       const cancelBtn = cel("button");
-      cancelBtn.textContent = "Anuluj";
       const acceptBtn = cel("button");
+
+      cancelBtn.textContent = "Anuluj";
       acceptBtn.textContent = "Akceptuj";
 
+      incomeLi.appendChild(incomeEditForm);
       incomeLi.appendChild(cancelBtn);
       incomeLi.appendChild(acceptBtn);
+
+      // event dla akceptuj
+      acceptBtn.addEventListener("click", (e) => {
+        incomeLiName.textContent = incomeNameEdit.value;
+        incomeLiAmount.textContent = incomeAmountEdit.value;
+        let index = incomeData.findIndex((i) => i.id === id); //wyszukuje indeks edytowanego elementu
+        incomeData[index].name = incomeNameEdit.value;
+        incomeData[index].amount = incomeAmountEdit.value;
+
+        showSumIncome();
+
+        incomeLi.appendChild(incomeLiName);
+        incomeLi.appendChild(incomeLiAmount);
+
+        sumBudget();
+      });
+
+      // event dla anuluj
+      cancelBtn.addEventListener("click", (e) => {
+        renderApp();
+      });
     });
 
     incomeList.appendChild(incomeLi);
   });
 };
 
-const renderIncomes = () => {
+const renderApp = () => {
   submitIncomes();
 };
 
@@ -122,17 +145,71 @@ const submitExpenses = () => {
     expenseLi.appendChild(deleteBtn);
     expenseLi.appendChild(editBtn);
 
-    //Buttony do usuwanie i edytowania listy
-    deleteBtn.addEventListener("click", (e) => {
+    //Buttony do usuwania i edytowania listy
+    deleteBtn.addEventListener("click", () => {
       deleteExpense(id);
     });
-    // editBtn.addEventListener("click", (e) => { })
+
+    editBtn.addEventListener("click", () => {
+      //usuwam <span> z nazwa i iloscia
+      expenseLi.removeChild(expenseLiName);
+      expenseLi.removeChild(expenseLiAmount);
+
+      //tworze forme i dwa inputy
+      const expenseEditForm = cel("form");
+      const expenseNameEdit = cel("input");
+      const expenseAmountEdit = cel("input");
+
+      expenseEditForm.classList.add = "editForm";
+      expenseNameEdit.classList.add = "editName";
+      expenseAmountEdit.classList.add = "editAmount";
+
+      expenseEditForm.appendChild(expenseNameEdit);
+      expenseEditForm.appendChild(expenseAmountEdit);
+      expenseNameEdit.value = `${name}`;
+      expenseAmountEdit.value = `${amount}`;
+
+      //usuwam buttony edytuj/usun, dodaje buttony akceptuj/anuluj
+      expenseLi.removeChild(editBtn);
+      expenseLi.removeChild(deleteBtn);
+
+      const cancelBtn = cel("button");
+      const acceptBtn = cel("button");
+
+      cancelBtn.textContent = "Anuluj";
+      acceptBtn.textContent = "Akceptuj";
+
+      expenseLi.appendChild(expenseEditForm);
+      expenseLi.appendChild(cancelBtn);
+      expenseLi.appendChild(acceptBtn);
+
+      // event dla akceptuj
+      acceptBtn.addEventListener("click", (e) => {
+        expenseLiName.textContent = expenseNameEdit.value;
+        expenseLiAmount.textContent = expenseAmountEdit.value;
+        let index = expenseData.findIndex((i) => i.id === id); //wyszukuje indeks edytowanego elementu
+        expenseData[index].name = expenseNameEdit.value;
+        expenseData[index].amount = expenseAmountEdit.value;
+
+        showSumExpense();
+
+        expenseLi.appendChild(expenseLiName);
+        expenseLi.appendChild(expenseLiAmount);
+
+        sumBudget();
+      });
+
+      // event dla anuluj
+      cancelBtn.addEventListener("click", (e) => {
+        renderApp2();
+      });
+    });
 
     expenseList.appendChild(expenseLi);
   });
 };
 
-const renderExpenses = () => {
+const renderApp2 = () => {
   submitExpenses();
 };
 
@@ -144,40 +221,68 @@ const renderExpenses = () => {
 const addIncomeData = (newIncome) => {
   const newIncomes = [...incomeData, newIncome];
   incomeData = newIncomes;
-  renderIncomes();
-  sumBudget();
+  renderApp();
 };
 
 const deleteIncome = (incomeId) => {
-  const deleteIncomes = incomeData.filter(({ id }) => id !== incomeId);
-  incomeData = deleteIncomes;
-  renderIncomes();
-  sumBudget();
+  const newIncomes = incomeData.filter(({ id }) => id !== incomeId);
+  incomeData = newIncomes;
+  renderApp();
 };
 
-const editIncome = (newIncome) => {
-  const editIncomes = incomeData.map(({ income }) =>
-    income.id === newIncome.id ? newIncome : income
-  );
-  incomeData = editIncomes;
-  renderIncomes();
+const sumIncome = () => {
+  return incomeData.reduce((acc, { amount }) => acc + amount, 0);
 };
+
+const showSumIncome = (incomeData) => {
+  incomeSum.textContent = `Suma przychodów wynosi ${sumIncome(incomeData)} zł`;
+};
+showSumIncome(incomeData);
 
 // funkcje zmieniające MODEL dla wydatków
 
 const addExpenseData = (newExpense) => {
   const newExpenses = [...expenseData, newExpense];
   expenseData = newExpenses;
-  renderExpenses();
-  sumBudget();
+  renderApp2();
 };
 
 const deleteExpense = (expenseId) => {
   const deleteExpenses = expenseData.filter(({ id }) => id !== expenseId);
   expenseData = deleteExpenses;
-  renderExpenses();
-  sumBudget();
+  renderApp2();
 };
+
+const sumExpense = () => {
+  return expenseData.reduce((acc, { amount }) => acc + amount, 0);
+};
+
+const showSumExpense = (expenseData) => {
+  expenseSum.textContent = `Suma wydatków wynosi ${sumExpense(expenseData)} zł`;
+};
+showSumExpense(expenseData);
+
+// SUM BUDGET
+// -------------------------------------------------
+
+const budget = () => {
+  return sumIncome(incomeData) - submitExpenses(expenseData);
+};
+
+const sumBudget = () => {
+  if (budget() > 0) {
+    mainSum.textContent = `Możesz wydać ${budget()} zł`;
+  }
+  if (budget() === 0) {
+    mainSum.textContent = `Masz ${budget()} zł`;
+  }
+  if (budget() < 0) {
+    mainSum.textContent = `Twój budżet jest ${Math.abs(
+      budget()
+    )} zł na minusie`;
+  }
+};
+sumBudget();
 
 // EVENTY
 // -------------------------------------------------
@@ -194,18 +299,9 @@ addIncome.addEventListener("submit", (e) => {
     amount: Number(newAmount.value),
   };
   addIncomeData(newIncome);
-
-  incomeSum.innerHTML = `Suma przychodów: ${incomeSaldo()} zł`;
-
-  renderIncomes();
+  showSumIncome();
   sumBudget();
 });
-
-//edycja po kliknieciu w przycisk nowa forma
-
-const incomeSaldo = () => {
-  return incomeData.reduce((acc, { amount }) => acc + amount, 0);
-};
 
 // dla wydatków
 addExpense.addEventListener("submit", (e) => {
@@ -219,36 +315,11 @@ addExpense.addEventListener("submit", (e) => {
     amount: Number(newAmount2.value),
   };
   addExpenseData(newExpense);
-
-  expenseSum.innerHTML = `Suma wydatków: ${expenseSaldo()} zł`;
-
+  showSumExpense();
   sumBudget();
-  renderExpenses();
 });
-
-const expenseSaldo = () => {
-  return expenseData.reduce((acc, { amount }) => acc + amount, 0);
-};
-
-// SUM BUDGET
-// -------------------------------------------------
-const incomeAndExpenseSum = () => {
-  return Number(incomeSaldo()) - Number(expenseSaldo());
-};
-
-const sumBudget = () => {
-  const budget = incomeAndExpenseSum();
-
-  if (budget > 0) {
-    mainSum.innerHTML = `Możesz wydać ${budget} zł`;
-  } else if (budget === 0) {
-    mainSum.innerHTML = `Masz ${budget} zł`;
-  } else {
-    mainSum.innerHTML = `Twój budżet jest ${Math.abs(budget)} zł na minusie`;
-  }
-};
 
 // START APP
 
-renderIncomes();
-renderExpenses();
+renderApp();
+renderApp2();
