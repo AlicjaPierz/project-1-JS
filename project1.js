@@ -223,23 +223,24 @@ const renderApp2 = () => {
 const addIncomeData = (newIncome) => {
   const newIncomes = [...incomeData, newIncome];
   incomeData = newIncomes;
+
   renderApp();
 };
 
 const deleteIncome = (incomeId) => {
   const newIncomes = incomeData.filter(({ id }) => id !== incomeId);
   incomeData = newIncomes;
+  showSumIncome();
+  sumBudget();
   renderApp();
 };
 
 const sumIncome = () => {
   return incomeData.reduce((acc, { amount }) => acc + amount, 0);
 };
-
-const showSumIncome = (incomeData) => {
-  incomeSum.textContent = `Suma przychodów wynosi ${sumIncome(incomeData)} zł`;
+const showSumIncome = () => {
+  incomeSum.textContent = `Suma przychodów wynosi ${sumIncome()} zł`;
 };
-showSumIncome(incomeData);
 
 // funkcje zmieniające MODEL dla wydatków
 
@@ -252,6 +253,8 @@ const addExpenseData = (newExpense) => {
 const deleteExpense = (expenseId) => {
   const deleteExpenses = expenseData.filter(({ id }) => id !== expenseId);
   expenseData = deleteExpenses;
+  showSumExpense();
+  sumBudget();
   renderApp2();
 };
 
@@ -259,16 +262,15 @@ const sumExpense = () => {
   return expenseData.reduce((acc, { amount }) => acc + amount, 0);
 };
 
-const showSumExpense = (expenseData) => {
-  expenseSum.textContent = `Suma wydatków wynosi ${sumExpense(expenseData)} zł`;
+const showSumExpense = () => {
+  expenseSum.textContent = `Suma wydatków wynosi ${sumExpense()} zł`;
 };
-showSumExpense(expenseData);
 
 // SUM BUDGET
 // -------------------------------------------------
 
 const budget = () => {
-  return sumIncome(incomeData) - sumExpense(expenseData);
+  return sumIncome() - sumExpense();
 };
 
 const sumBudget = () => {
