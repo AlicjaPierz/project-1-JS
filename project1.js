@@ -1,7 +1,6 @@
 //HELPER FUNCTIONS
 // -------------------------------------------------
 const qs = (selector) => document.querySelector(selector);
-const qsA = (sel) => document.querySelectorAll(sel);
 const cel = (el) => document.createElement(el);
 
 //DOM ELEMENTS
@@ -9,6 +8,7 @@ const cel = (el) => document.createElement(el);
 const addIncome = qs("#add-income");
 const incomeList = qs(".income-list");
 const incomeSum = qs("#income-sum");
+const nameIncome = qs(".name-income");
 
 const addExpense = qs("#add-expense");
 const expenseList = qs(".expense-list");
@@ -96,7 +96,7 @@ const submitIncomes = () => {
         incomeLiAmount.textContent = incomeAmountEdit.value;
         let index = incomeData.findIndex((i) => i.id === id); //wyszukuje indeks edytowanego elementu
         incomeData[index].name = incomeNameEdit.value;
-        incomeData[index].amount = incomeAmountEdit.value;
+        incomeData[index].amount = Number(incomeAmountEdit.value);
 
         showSumIncome();
 
@@ -104,6 +104,7 @@ const submitIncomes = () => {
         incomeLi.appendChild(incomeLiAmount);
 
         sumBudget();
+        renderApp();
       });
 
       // event dla anuluj
@@ -189,7 +190,7 @@ const submitExpenses = () => {
         expenseLiAmount.textContent = expenseAmountEdit.value;
         let index = expenseData.findIndex((i) => i.id === id); //wyszukuje indeks edytowanego elementu
         expenseData[index].name = expenseNameEdit.value;
-        expenseData[index].amount = expenseAmountEdit.value;
+        expenseData[index].amount = Number(expenseAmountEdit.value);
 
         showSumExpense();
 
@@ -197,6 +198,7 @@ const submitExpenses = () => {
         expenseLi.appendChild(expenseLiAmount);
 
         sumBudget();
+        renderApp2();
       });
 
       // event dla anuluj
@@ -266,7 +268,7 @@ showSumExpense(expenseData);
 // -------------------------------------------------
 
 const budget = () => {
-  return sumIncome(incomeData) - submitExpenses(expenseData);
+  return sumIncome(incomeData) - sumExpense(expenseData);
 };
 
 const sumBudget = () => {
